@@ -1,3 +1,5 @@
+import config from './config.js'; // Import the config
+
 const sendBtn = document.getElementById('sendBtn');
 const inputText = document.getElementById('inputText');
 const chatBox = document.getElementById('chatBox');
@@ -12,8 +14,9 @@ window.addEventListener('load', async () => {
 });
 
 async function fetchLocationAndTime() {
+    const ipApiKey = config.ipApiKey;
     try {
-        const response = await fetch('https://ipinfo.io/json?token=a31a01378513be'); // Token from ipinfo.io
+        const response = await fetch(`https://ipinfo.io/json?token=${ipApiKey}`); // Token from ipinfo.io
         const locationData = await response.json();
         const { city, region, country } = locationData;
 
@@ -85,7 +88,7 @@ async function handleUserInput(userInput) {
 }
 
 async function fetchWeather() {
-    const apiKey = '5efc96245a17257ae45388f95bf301b0'; 
+    const apiKey = config.openWeatherMapToken;; 
     const url = `https://api.openweathermap.org/data/2.5/weather?q=${userCity}&units=metric&appid=${apiKey}`;
 
     try {
@@ -113,7 +116,7 @@ async function fetchBotResponse(userInput) {
     chatBox.scrollTop = chatBox.scrollHeight;
 
     try {
-        const apiKey = 'AIzaSyD4BG_pvKJ4xApCDoxzvNn-y4-micwI6rs';
+        const apiKey = config.googleApiKey;;
         const response = await fetch(
             `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`,
             {
