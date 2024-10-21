@@ -85,7 +85,7 @@ async function handleUserInput(userInput) {
 }
 
 async function fetchWeather() {
-    const apiKey = '5efc96245a17257ae45388f95bf301b0'; // Replace with your OpenWeatherMap API key
+    const apiKey = '5efc96245a17257ae45388f95bf301b0'; 
     const url = `https://api.openweathermap.org/data/2.5/weather?q=${userCity}&units=metric&appid=${apiKey}`;
 
     try {
