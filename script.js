@@ -5,6 +5,31 @@ const voiceBtn = document.getElementById('voiceBtn');
 const micIcon = voiceBtn.querySelector('img'); // Select the mic icon
 
 let isVoiceInput = false;
+let userCity = ''; // Store city globally for weather-related queries
+
+window.addEventListener('load', async () => {
+    await fetchLocationAndTime();
+});
+
+async function fetchLocationAndTime() {
+    try {
+        const response = await fetch('https://ipinfo.io/json?token=a31a01378513be'); // Token from ipinfo.io
+        const locationData = await response.json();
+        const { city, region, country } = locationData;
+
+        userCity = city; // Store the city for weather-related queries
+
+        const now = new Date();
+        const dateTimeString = now.toLocaleString();
+
+        const welcomeMessage = `Hello! You are accessing from ${city}, ${region}, ${country}. 
+        Current date and time: ${dateTimeString}.`;
+        appendMessage('bot', welcomeMessage);
+    } catch (error) {
+        appendMessage('bot', 'Could not retrieve location or time.');
+        console.error('Location/Time Error:', error);
+    }
+}
 
 sendBtn.addEventListener('click', async () => {
     const text = inputText.value;
@@ -13,7 +38,7 @@ sendBtn.addEventListener('click', async () => {
     appendMessage('user', text);
     inputText.value = '';
     isVoiceInput = false;
-    await fetchBotResponse(text);
+    await handleUserInput(text);
 });
 
 inputText.addEventListener('keypress', (e) => {
@@ -29,26 +54,55 @@ function startVoiceInput() {
     recognition.lang = 'en-US';
 
     recognition.onstart = () => {
-        micIcon.classList.add('blinking'); // Start blinking
+        micIcon.classList.add('blinking');
     };
 
     recognition.onresult = (event) => {
         const voiceText = event.results[0][0].transcript;
         appendMessage('user', voiceText);
         isVoiceInput = true;
-        fetchBotResponse(voiceText);
+        handleUserInput(voiceText);
     };
 
     recognition.onend = () => {
-        micIcon.classList.remove('blinking'); // Stop blinking
+        micIcon.classList.remove('blinking');
     };
 
     recognition.onerror = (event) => {
-        micIcon.classList.remove('blinking'); // Stop blinking on error
+        micIcon.classList.remove('blinking');
         console.error('Voice recognition error:', event.error);
     };
 
     recognition.start();
+}
+
+async function handleUserInput(userInput) {
+    if (/weather/i.test(userInput)) {
+        await fetchWeather();
+    } else {
+        await fetchBotResponse(userInput);
+    }
+}
+
+async function fetchWeather() {
+    const apiKey = '5efc96245a17257ae45388f95bf301b0'; // Replace with your OpenWeatherMap API key
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${userCity}&units=metric&appid=${apiKey}`;
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Unable to fetch weather data');
+
+        const weatherData = await response.json();
+        const temp = weatherData.main.temp;
+        const description = weatherData.weather[0].description;
+        const weatherMessage = `The current weather in ${userCity} is ${temp}°C with ${description}.`;
+
+        appendMessage('bot', weatherMessage);
+        if (isVoiceInput) speak(weatherMessage);
+    } catch (error) {
+        appendMessage('bot', 'Sorry, I could not fetch the weather data.');
+        console.error('Weather Fetch Error:', error);
+    }
 }
 
 async function fetchBotResponse(userInput) {
@@ -59,24 +113,23 @@ async function fetchBotResponse(userInput) {
     chatBox.scrollTop = chatBox.scrollHeight;
 
     try {
-        const apiKey = 'AIzaSyD4BG_pvKJ4xApCDoxzvNn-y4-micwI6rs'; // Replace with your Gemini API key
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ contents: [{ parts: [{ text: userInput }] }] })
-        });
+        const apiKey = 'AIzaSyD4BG_pvKJ4xApCDoxzvNn-y4-micwI6rs';
+        const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`,
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts: [{ text: userInput }] }] }),
+            }
+        );
 
         if (!response.ok) throw new Error('Network response was not ok');
-
         const data = await response.json();
         const botResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || 'I did not understand that.';
 
         setTimeout(() => {
             typingIndicator.remove();
             appendMessage('bot', botResponse);
-
             if (isVoiceInput) speak(botResponse);
         }, 1000);
     } catch (error) {
