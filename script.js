@@ -97,7 +97,7 @@ function startVoiceInput() {
 async function handleUserInput(userInput) {
     userInput = userInput.toLowerCase();
 
-    if (/address|location|region/i.test(userInput)) {
+    if (/address|location|region|where am i/i.test(userInput)) {
         const address = `You are in ${cachedData.city}, ${cachedData.region}, ${cachedData.country}.`;
         appendMessage('bot', address);
         if (isVoiceInput) speak(address);
@@ -112,11 +112,13 @@ async function handleUserInput(userInput) {
             const city = cityMatch[1];
             const weatherMessage = await fetchWeather(city); // Fetch weather for the specified city
             appendMessage('bot', weatherMessage);
+            if (isVoiceInput) speak(weatherMessage); // Speak the specific city's weather
         } else {
             // Use cached weather data for the detected city
-            appendMessage('bot', ipWeatherData || 'Weather data unavailable for your current location.');
+            const defaultWeatherMessage = ipWeatherData || 'Weather data unavailable for your current location.';
+            appendMessage('bot', defaultWeatherMessage);
+            if (isVoiceInput) speak(defaultWeatherMessage); // Speak the default message
         }
-        if (isVoiceInput) speak(ipWeatherData);
     } else if (/country/i.test(userInput)) {
         const countryMessage = `You are currently in ${cachedData.country}.`;
         appendMessage('bot', countryMessage);
