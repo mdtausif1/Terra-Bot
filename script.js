@@ -25,7 +25,7 @@ async function gatherInitialInfo() {
         cachedData.city = city;
         cachedData.region = region;
         cachedData.country = country;
-        cachedData.dateTime = now.toLocaleString();
+        cachedData.dateTime = now.toLocaleString(); // Store current time in a readable format
 
         ipWeatherData = await fetchWeather(city); // Fetch weather based on IP-detected city
     } catch (error) {
@@ -97,14 +97,38 @@ function startVoiceInput() {
 async function handleUserInput(userInput) {
     userInput = userInput.toLowerCase();
 
+    // Handle location-related queries
     if (/address|location|region|where am i/i.test(userInput)) {
         const address = `You are in ${cachedData.city}, ${cachedData.region}, ${cachedData.country}.`;
         appendMessage('bot', address);
         if (isVoiceInput) speak(address);
-    } else if (/time/i.test(userInput)) {
-        const timeMessage = `Current time: ${cachedData.dateTime}`;
+    } else if (/country/i.test(userInput)) {
+        const countryMessage = `You are currently in ${cachedData.country}.`;
+        appendMessage('bot', countryMessage);
+        if (isVoiceInput) speak(countryMessage);
+    } else if (/state|province/i.test(userInput)) {
+        const stateMessage = `Based on your IP, you are in ${cachedData.region}.`;
+        appendMessage('bot', stateMessage);
+        if (isVoiceInput) speak(stateMessage);
+    } else if (/time|current time|what is the time/i.test(userInput)) {
+        const now = new Date();
+        const hours = now.getHours();
+        const minutes = now.getMinutes();
+        const period = hours >= 12 ? 'PM' : 'AM';
+        const formattedTime = `${hours % 12 || 12}:${String(minutes).padStart(2, '0')} ${period}`;
+        const timeMessage = `Current time: ${formattedTime}`;
         appendMessage('bot', timeMessage);
         if (isVoiceInput) speak(timeMessage);
+    } else if (/date|today's date|what is the date/i.test(userInput)) {
+        const now = new Date();
+        const dateMessage = `Today's date is ${now.toLocaleDateString()}.`;
+        appendMessage('bot', dateMessage);
+        if (isVoiceInput) speak(dateMessage);
+    } else if (/day|today/i.test(userInput)) {
+        const now = new Date();
+        const dayMessage = `Today is ${now.toLocaleDateString('en-US', { weekday: 'long' })}.`;
+        appendMessage('bot', dayMessage);
+        if (isVoiceInput) speak(dayMessage);
     } else if (/weather/i.test(userInput)) {
         const cityMatch = userInput.match(/(?:weather\s+in|in)\s+(\w+)/); // Extract city name from query
 
@@ -112,17 +136,12 @@ async function handleUserInput(userInput) {
             const city = cityMatch[1];
             const weatherMessage = await fetchWeather(city); // Fetch weather for the specified city
             appendMessage('bot', weatherMessage);
-            if (isVoiceInput) speak(weatherMessage); // Speak the specific city's weather
+            if (isVoiceInput) speak(weatherMessage);
         } else {
             // Use cached weather data for the detected city
-            const defaultWeatherMessage = ipWeatherData || 'Weather data unavailable for your current location.';
-            appendMessage('bot', defaultWeatherMessage);
-            if (isVoiceInput) speak(defaultWeatherMessage); // Speak the default message
+            appendMessage('bot', ipWeatherData || 'Weather data unavailable for your current location.');
+            if (isVoiceInput) speak(ipWeatherData);
         }
-    } else if (/country/i.test(userInput)) {
-        const countryMessage = `You are currently in ${cachedData.country}.`;
-        appendMessage('bot', countryMessage);
-        if (isVoiceInput) speak(countryMessage);
     } else {
         await fetchBotResponse(userInput);
     }
@@ -177,11 +196,15 @@ function speak(text) {
 }
 
 function pauseSpeech() {
-    if (window.speechSynthesis.speaking) {
-        window.speechSynthesis.pause();
-    } else {
-        window.speechSynthesis.resume();
-    }
+    window.speechSynthesis.pause();
+    sendBtn.onclick = resumeSpeech;
+    sendBtn.textContent = '▶️';
+}
+
+function resumeSpeech() {
+    window.speechSynthesis.resume();
+    sendBtn.onclick = pauseSpeech;
+    sendBtn.textContent = '⏸️';
 }
 
 function appendMessage(role, text) {
