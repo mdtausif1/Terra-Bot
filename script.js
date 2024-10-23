@@ -98,12 +98,16 @@ async function handleUserInput(userInput) {
     userInput = userInput.toLowerCase();
 
     // Handle location-related queries
-    if (/address|location|region|where am i|from where am i/i.test(userInput)) {
-        const address = `You are in ${cachedData.city}, ${cachedData.region}, ${cachedData.country}.`;
+    if (/address|location|region|where am i|from where am i|from where i am/i.test(userInput)) {
+        const address = `Based on your IP, You are in ${cachedData.city}, ${cachedData.region}, ${cachedData.country}.`;
         appendMessage('bot', address);
         if (isVoiceInput) speak(address);
-    } else if (/country/i.test(userInput)) {
-        const countryMessage = `You are currently in ${cachedData.country}.`;
+    } else if (/city/i.test(userInput)) {
+        const countryMessage = `Based on your IP, You are currently in ${cachedData.city}.`;
+        appendMessage('bot', countryMessage);
+        if (isVoiceInput) speak(countryMessage);
+    }else if (/country/i.test(userInput)) {
+        const countryMessage = `Based on your IP, You are currently in ${cachedData.country}.`;
         appendMessage('bot', countryMessage);
         if (isVoiceInput) speak(countryMessage);
     } else if (/state|province/i.test(userInput)) {
