@@ -98,7 +98,7 @@ async function handleUserInput(userInput) {
     userInput = userInput.toLowerCase();
 
     // Handle location-related queries
-    if (/address|location|region|where am i/i.test(userInput)) {
+    if (/address|location|region|where am i|from where am i/i.test(userInput)) {
         const address = `You are in ${cachedData.city}, ${cachedData.region}, ${cachedData.country}.`;
         appendMessage('bot', address);
         if (isVoiceInput) speak(address);
