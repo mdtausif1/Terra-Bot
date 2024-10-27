@@ -94,6 +94,7 @@ function startVoiceInput() {
 }
 
 // Handle user input with dynamic location and weather queries
+// Handle user input with dynamic location and weather queries
 async function handleUserInput(userInput) {
     userInput = userInput.toLowerCase();
 
@@ -146,10 +147,28 @@ async function handleUserInput(userInput) {
             appendMessage('bot', ipWeatherData || 'Weather data unavailable for your current location.');
             if (isVoiceInput) speak(ipWeatherData);
         }
+    } // Name responses
+    else if (/what\s+is\s+your\s+name|who\s+are\s+you|name\s+are\s+you|your\s+name|who\s+is\s+this/i.test(userInput)) {
+        const nameMessage = 'My name is Terra-Bot.';
+        appendMessage('bot', nameMessage);
+        if (isVoiceInput) speak(nameMessage);
+    }
+    // Developer responses
+    else if (/who\s+is\s+the\s+developer|who\s+developed\s+you|owned\s+by|created\s+by|who\s+made\s+you/i.test(userInput)) {
+        const developerMessage = 'I am developed by Md Tausif.';
+        appendMessage('bot', developerMessage);
+        if (isVoiceInput) speak(developerMessage);
+    }
+    // Ownership responses
+    else if (/who\s+is\s+the\s+owner|who\s+owns|who\s+is\s+the\s+owner\s+of|owner\s+of/i.test(userInput)) {
+        const ownerMessage = 'The application is owned by Md Tausif.';
+        appendMessage('bot', ownerMessage);
+        if (isVoiceInput) speak(ownerMessage);
     } else {
         await fetchBotResponse(userInput);
     }
 }
+
 
 // Fetch bot response from external API
 async function fetchBotResponse(userInput) {
@@ -238,14 +257,20 @@ function resumeSpeech() {
     sendBtn.onclick = pauseSpeech;
     sendBtn.textContent = '⏸️';
 }
-
 function appendMessage(role, text) {
     const messageDiv = document.createElement('div');
     messageDiv.className = role === 'user' ? 'user-message' : 'bot-message';
-    messageDiv.textContent = role === 'user' ? `You: ${text}` : `Bot: ${text}`;
+    
+    // Prepend "Terra-Bot:" for bot responses
+    if (role === 'bot') {
+        text = `Terra-Bot: ${text}`;
+    }
+
+    messageDiv.textContent = role === 'user' ? `You: ${text}` : text;
     chatBox.appendChild(messageDiv);
     chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to the latest message
 }
+
 
 // Handle any cleanup actions when the window is closed
 window.addEventListener('beforeunload', () => {
