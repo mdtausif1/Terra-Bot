@@ -161,12 +161,39 @@ async function fetchBotResponse(userInput) {
 
     try {
         const apiKey = 'AIzaSyD4BG_pvKJ4xApCDoxzvNn-y4-micwI6rs'; // Replace with your API key
+
+        // Prepare the context for the request
+        const context = {
+            userQuestion: userInput,
+            currentDate: new Date().toLocaleDateString(), // Current date
+            currentTime: new Date().toLocaleTimeString(), // Current time
+            location: {
+                city: cachedData.city,
+                region: cachedData.region,
+                country: cachedData.country
+            }
+        };
+
+        // Construct the request body with context and instructions for the response
+        const body = {
+            contents: [{
+                parts: [{
+                    text: `User's question: ${context.userQuestion}\n` +
+                          `Please reply in 50 to 200 words and summarize the information.\n` +
+                          `Use this information for better clarification and do not include this in the answer:\n` +
+                          `Current date: ${context.currentDate}\n` +
+                          `Current time: ${context.currentTime}\n` +
+                          `User's location: ${context.location.city}, ${context.location.region}, ${context.location.country}`
+                }]
+            }]
+        };
+
         const response = await fetch(
             `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`,
             {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ parts: [{ text: userInput }] }] }),
+                body: JSON.stringify(body),
             }
         );
 
@@ -184,6 +211,7 @@ async function fetchBotResponse(userInput) {
         appendMessage('bot', 'Error: ' + error.message);
     }
 }
+
 
 function speak(text) {
     const utterance = new SpeechSynthesisUtterance(text);
