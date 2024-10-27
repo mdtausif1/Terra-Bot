@@ -36,7 +36,7 @@ async function gatherInitialInfo() {
 
 // Fetch weather for a specific city
 async function fetchWeather(city) {
-    const apiKey = '5efc96245a17257ae45388f95bf301b0';
+    const apiKey = '5efc96245a17257ae45388f95bf301b0'; // Replace with your API key
     const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
 
     try {
@@ -60,7 +60,7 @@ async function fetchWeather(city) {
 
 // Event listeners for input submission
 sendBtn.addEventListener('click', async () => {
-    const text = inputText.value;
+    const text = inputText.value.trim();
     if (!text) return;
 
     appendMessage('user', text);
@@ -106,7 +106,7 @@ async function handleUserInput(userInput) {
         const countryMessage = `Based on your IP, You are currently in ${cachedData.city}.`;
         appendMessage('bot', countryMessage);
         if (isVoiceInput) speak(countryMessage);
-    }else if (/country/i.test(userInput)) {
+    } else if (/country/i.test(userInput)) {
         const countryMessage = `Based on your IP, You are currently in ${cachedData.country}.`;
         appendMessage('bot', countryMessage);
         if (isVoiceInput) speak(countryMessage);
@@ -160,7 +160,7 @@ async function fetchBotResponse(userInput) {
     chatBox.scrollTop = chatBox.scrollHeight;
 
     try {
-        const apiKey = 'AIzaSyD4BG_pvKJ4xApCDoxzvNn-y4-micwI6rs';
+        const apiKey = 'AIzaSyD4BG_pvKJ4xApCDoxzvNn-y4-micwI6rs'; // Replace with your API key
         const response = await fetch(
             `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`,
             {
@@ -216,5 +216,10 @@ function appendMessage(role, text) {
     messageDiv.className = role === 'user' ? 'user-message' : 'bot-message';
     messageDiv.textContent = role === 'user' ? `You: ${text}` : `Bot: ${text}`;
     chatBox.appendChild(messageDiv);
-    chatBox.scrollTop = chatBox.scrollHeight;
+    chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to the latest message
 }
+
+// Handle any cleanup actions when the window is closed
+window.addEventListener('beforeunload', () => {
+    window.speechSynthesis.cancel(); // Stop any ongoing speech when leaving the page
+});

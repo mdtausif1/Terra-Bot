@@ -2,42 +2,31 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Terra Bot Chat Interface</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Terra Bot - Chat Interface</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="chat-container">
-        <h1>Terra-Bot</h1>
+        <header class="chat-header">
+            <h1>Terra-Bot</h1>
+        </header>
 
         <!-- Chat Box -->
         <div id="chatBox" class="chat-box"></div>
 
-        <!-- Listening Popup -->
-        <div id="listeningPopup" class="popup hidden">
-            <div class="popup-content">
-                <div class="loading-spinner"></div>
-                <p>Listening...</p>
-            </div>
-        </div>
-
         <!-- Input Section -->
         <div class="input-container">
-            <input type="text" id="inputText" placeholder="Type your message here..." />
-
-            <!-- Voice Button -->
             <button id="voiceBtn" class="icon-button">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/8/80/MicrophoneAudio.svg" 
-                     alt="Voice Input" class="icon" />
+                     alt="Voice Input" class="icon">
             </button>
-
-            <!-- Send Button -->
-            <button id="sendBtn">Send</button>
+            <input type="text" id="inputText" placeholder="Type your message..." />
+            <button id="sendBtn" class="send-button">➤</button>
         </div>
     </div>
 
-    <!-- Footer Section -->
-    <footer id="footer" class="footer">
+    <footer class="footer">
         Developed by Md Tausif © 2024. All rights reserved.
     </footer>
 
