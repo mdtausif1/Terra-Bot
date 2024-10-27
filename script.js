@@ -94,7 +94,6 @@ function startVoiceInput() {
 }
 
 // Handle user input with dynamic location and weather queries
-// Handle user input with dynamic location and weather queries
 async function handleUserInput(userInput) {
     userInput = userInput.toLowerCase();
 
@@ -105,10 +104,6 @@ async function handleUserInput(userInput) {
         if (isVoiceInput) speak(address);
     } else if (/city/i.test(userInput)) {
         const countryMessage = `Based on your IP, You are currently in ${cachedData.city}.`;
-        appendMessage('bot', countryMessage);
-        if (isVoiceInput) speak(countryMessage);
-    } else if (/country/i.test(userInput)) {
-        const countryMessage = `Based on your IP, You are currently in ${cachedData.country}.`;
         appendMessage('bot', countryMessage);
         if (isVoiceInput) speak(countryMessage);
     } else if (/state|province/i.test(userInput)) {
@@ -171,7 +166,9 @@ async function handleUserInput(userInput) {
 
 
 // Fetch bot response from external API
+// Fetch bot response from external API
 async function fetchBotResponse(userInput) {
+    // This function remains for general queries, excluding specific questions like Prime Minister.
     const typingIndicator = document.createElement('div');
     typingIndicator.className = 'typing-indicator';
     typingIndicator.textContent = 'Bot is typing...';
@@ -181,15 +178,21 @@ async function fetchBotResponse(userInput) {
     try {
         const apiKey = 'AIzaSyD4BG_pvKJ4xApCDoxzvNn-y4-micwI6rs'; // Replace with your API key
 
+        const currentDate = new Date().toLocaleDateString();
+        const currentTime = new Date().toLocaleTimeString();
+        const locationCity = cachedData.city || "unknown location";
+        const locationRegion = cachedData.region || "unknown region";
+        const locationCountry = cachedData.country || "unknown country";
+
         // Prepare the context for the request
         const context = {
             userQuestion: userInput,
-            currentDate: new Date().toLocaleDateString(), // Current date
-            currentTime: new Date().toLocaleTimeString(), // Current time
+            currentDate,
+            currentTime,
             location: {
-                city: cachedData.city,
-                region: cachedData.region,
-                country: cachedData.country
+                city: locationCity,
+                region: locationRegion,
+                country: locationCountry
             }
         };
 
@@ -197,12 +200,14 @@ async function fetchBotResponse(userInput) {
         const body = {
             contents: [{
                 parts: [{
-                    text: `User's question: ${context.userQuestion}\n` +
+                    text: `User's question: ${context.userQuestion}\n`  +
                           `Please reply in 50 to 200 words and summarize the information.\n` +
-                          `Use this information for better clarification and do not include this in the answer:\n` +
+                          `Use this information for better clarification and do not include this in the answer as you don't have access to the current data:\n` +
                           `Current date: ${context.currentDate}\n` +
                           `Current time: ${context.currentTime}\n` +
-                          `User's location: ${context.location.city}, ${context.location.region}, ${context.location.country}`
+                          `User's location: ${context.location.city}, ${context.location.region}\n` +
+                          `User's Country-Code: ${context.location.country}\n` +
+                          `If you lack sufficient information to answer the question accurately, please indicate that in your response.`
                 }]
             }]
         };
@@ -230,6 +235,9 @@ async function fetchBotResponse(userInput) {
         appendMessage('bot', 'Error: ' + error.message);
     }
 }
+
+
+
 
 
 function speak(text) {
