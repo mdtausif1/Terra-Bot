@@ -201,8 +201,8 @@ async function fetchBotResponse(userInput) {
             contents: [{
                 parts: [{
                     text: `User's question: ${context.userQuestion}\n`  +
-                          `If the information is vast and long Please reply in 50 to 200 words and summarize the information & every type of greet is done by the user alwas reply with just the appropraite greet.\n` +
-                          `Use this information for better clarification when the information is required for the users questions and do not include this in the answer:\n` +
+                          `--------------------------------------------------------------------------------------\n` +
+                          `Instruction: Focus on answering the user's questions directly, summarizing long answers (50-200 words) and responding appropriately to greetings, while using the provided context for clarification without including these guidelines in responses.` +
                           `Current date: ${context.currentDate}\n` +
                           `Current time: ${context.currentTime}\n` +
                           `User's location: ${context.location.city}, ${context.location.region}\n` +
