@@ -202,7 +202,7 @@ async function fetchBotResponse(userInput) {
                 parts: [{
                     text: `User's question: ${context.userQuestion}\n`  +
                           `Please reply in 50 to 200 words and summarize the information.\n` +
-                          `Use this information for better clarification and do not include this in the answer as you don't have access to the current data:\n` +
+                          `Use this information for better clarification when the information is required for the users questions and do not include this in the answer:\n` +
                           `Current date: ${context.currentDate}\n` +
                           `Current time: ${context.currentTime}\n` +
                           `User's location: ${context.location.city}, ${context.location.region}\n` +
