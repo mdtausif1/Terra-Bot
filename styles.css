@@ -186,14 +186,3 @@ input::placeholder {
     }
 }
 
-/* Add this to your CSS */
-
-@media (max-width: 768px) {
-    .chat-container {
-        height: calc(100vh - 20px); /* Adjusting the height */
-    }
-
-    .chat-box {
-        padding-bottom: 60px; /* Ensures messages are not obscured by the keyboard */
-    }
-}

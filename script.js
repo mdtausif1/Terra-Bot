@@ -285,17 +285,3 @@ window.addEventListener('beforeunload', () => {
     window.speechSynthesis.cancel(); // Stop any ongoing speech when leaving the page
 });
 
-// Add this function to your JavaScript file
-
-function adjustChatContainerHeight() {
-    const viewportHeight = window.innerHeight;
-    const chatContainer = document.querySelector('.chat-container');
-    chatContainer.style.height = `${viewportHeight - 100}px`; // Adjust based on your footer size
-}
-
-// Add an event listener for window resize
-window.addEventListener('resize', adjustChatContainerHeight);
-
-// Call the function once on load to set initial height
-window.addEventListener('load', adjustChatContainerHeight);
-
