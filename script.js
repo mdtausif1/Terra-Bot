@@ -176,7 +176,7 @@ async function fetchBotResponse(userInput) {
     chatBox.scrollTop = chatBox.scrollHeight;
 
     try {
-        const apiKey = 'AIzaSyBvTrPuzjIy5BAkG53hX5WFn0K2smfeTbY'; // Replace with your API key
+        const apiKey = 'AIzaSyDnuDrh1wI7q9kUSRoy6wBCxIPrJEwn15s'; // Replace with your API key
 
         const currentDate = new Date().toLocaleDateString();
         const currentTime = new Date().toLocaleTimeString();
