@@ -107,36 +107,61 @@ async function handleInput(text) {
 // Core logic for handling user input
 async function handleUserInput(userInput) {
     // Location-related responses
-    if (/location|where am i|city|region|address/i.test(userInput)) {
-      const locationMessage = `Based on your IP, you're in ${cachedData.city}, ${cachedData.region}, ${cachedData.country}.`;
-      appendMessage("bot", locationMessage);
-      if (isVoiceInput) speak(locationMessage);
+    if (/location|where am i|which country|current location|city/i.test(userInput)) {
+      if (cachedData.city && cachedData.region && cachedData.country) {
+        // Reply with full country name if available
+        const countryName = await getCountryName(cachedData.country);
+        const locationMessage = `Based on your IP, you're in ${cachedData.city || "an unknown city"}, ${cachedData.region || "an unknown state"}, ${countryName}.`;
+        appendMessage("bot", locationMessage);
+        if (isVoiceInput) speak(locationMessage);
+      } else {
+        appendMessage("bot", "I couldn't fetch your location. Please check your device settings.");
+        if (isVoiceInput) speak("I couldn't fetch your location. Please check your device settings.");
+      }
     }
-    // Time and date-related responses
+  
+    // Time-related responses
     else if (/time|current time/i.test(userInput)) {
       const now = new Date();
       const formattedTime = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
       appendMessage("bot", `The current time is ${formattedTime}.`);
-    } else if (/date|today's date/i.test(userInput)) {
-      const today = new Date().toLocaleDateString();
+      if (isVoiceInput) speak(`The current time is ${formattedTime}.`);
+    }
+  
+    // Date-related responses
+    else if (/date|today's date/i.test(userInput)) {
+      const today = new Date().toLocaleDateString("en-US");  // MM/DD/YYYY format
       appendMessage("bot", `Today's date is ${today}.`);
+      if (isVoiceInput) speak(`Today's date is ${today}.`);
     }
-    // Weather-related responses
-    else if (/weather/i.test(userInput)) {
-      // Match city names with spaces (e.g., "New York")
-      const match = userInput.match(/weather in ([a-zA-Z\s]+)/);
-      const city = match ? match[1].trim() : cachedData.city;
-    
-      const weatherMessage = await fetchWeather(city);
-      appendMessage("bot", weatherMessage);
-      if (isVoiceInput) speak(weatherMessage);
+  
+    // Day-related responses
+    else if (/day/i.test(userInput)) {
+      const now = new Date();
+      const day = now.toLocaleString('en-US', { weekday: 'long' });  // Gets the full day name
+      const date = now.toLocaleDateString('en-US'); // MM/DD/YYYY format
+      appendMessage("bot", `Today is ${day}, ${date}.`);
+      if (isVoiceInput) speak(`Today is ${day}, ${date}.`);
     }
-    // Remember name response (updated regex to allow both "as" and "is")
+  
+    // Developer info
+    else if (/who made you|developer/i.test(userInput)) {
+      appendMessage("bot", "I was developed by Md Tausif.");
+      if (isVoiceInput) speak("I was developed by Md Tausif.");
+    }
+  
+    // Owner info
+    else if (/who is the owner of this application|owner/i.test(userInput)) {
+      appendMessage("bot", "The owner of this application is also Md Tausif.");
+      if (isVoiceInput) speak("The owner of this application is Md Tausif.");
+    } 
+  
+    // Remember name response
     else if (/remember my name (is|as)/i.test(userInput)) {
       const nameMatch = userInput.match(/remember my name (is|as) (\w+)/i);
       if (nameMatch) {
         userName = nameMatch[2];
-        localStorage.setItem("userName", userName); // Store the name in localStorage
+        localStorage.setItem("userName", userName);
         appendMessage("bot", `Got it! I'll remember your name as ${userName}.`);
         if (isVoiceInput) speak(`Got it! I'll remember your name as ${userName}.`);
       } else {
@@ -144,12 +169,14 @@ async function handleUserInput(userInput) {
         if (isVoiceInput) speak("Please provide your name after 'remember my name as' or 'remember my name is'.");
       }
     }
+  
     // Respond with user's name if remembered
     else if (/who am i|what is my name|my name/i.test(userInput)) {
       const nameMessage = userName ? `Your name is ${userName}.` : "I don't know your name yet.";
       appendMessage("bot", nameMessage);
       if (isVoiceInput) speak(nameMessage);
     }
+  
     // Bot info
     else if (/who are you/i.test(userInput)) {
       const greetingMessage = userName
@@ -158,6 +185,7 @@ async function handleUserInput(userInput) {
       appendMessage("bot", greetingMessage);
       if (isVoiceInput) speak(greetingMessage);
     }
+  
     // Developer info
     else if (/who made you|developer|owner/i.test(userInput)) {
       appendMessage("bot", "I was developed by Md Tausif.");
@@ -166,7 +194,24 @@ async function handleUserInput(userInput) {
     }
   }
   
-
+  // Helper function to get full country name
+  async function getCountryName(countryCode) {
+    const countryNames = {
+      "IN": "India",
+      "US": "United States",
+      "GB": "United Kingdom",
+      "CA": "Canada",
+      "AU": "Australia",
+      "DE": "Germany",
+      // Add more country codes and names as needed
+    };
+    
+    return countryNames[countryCode] || "an unknown country"; // Default if country not found
+  }
+  
+  
+  
+  
 // Fetch response from Gemini API
 async function fetchBotResponse(userInput) {
   const typingIndicator = document.createElement("div");
