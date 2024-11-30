@@ -127,8 +127,18 @@ async function handleUserInput(userInput) {
       appendMessage("bot", "Your name has been forgotten.");
       if (isVoiceInput) speak("Your name has been forgotten.");
     }
+
+      // Handle "My name is" scenario to remember the name
+      else if (/my name is (\w+)/i.test(userInput)) {
+        const nameMatch = userInput.match(/my name is (\w+)/i);
+        if (nameMatch) {
+            userName = nameMatch[1];  // Set userName to the captured name
+            localStorage.setItem("userName", userName);  // Store it in localStorage
+            appendMessage("bot", `Got it! I'll remember your name as ${userName}.`);
+            if (isVoiceInput) speak(`Got it! I'll remember your name as ${userName}.`);
+        }
+    }
     
-  
     // Time-related responses
     else if (/time|current time/i.test(userInput)) {
       const now = new Date();
