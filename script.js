@@ -119,6 +119,15 @@ async function handleUserInput(userInput) {
         if (isVoiceInput) speak("I couldn't fetch your location. Please check your device settings.");
       }
     }
+
+    // Forget name logic
+    else if (/forget my name|erase my name|clear my name/i.test(userInput)) {
+      localStorage.removeItem("userName");  // Remove name from local storage
+      userName = "";  // Reset the userName variable
+      appendMessage("bot", "Your name has been forgotten.");
+      if (isVoiceInput) speak("Your name has been forgotten.");
+    }
+    
   
     // Time-related responses
     else if (/time|current time/i.test(userInput)) {
@@ -176,7 +185,6 @@ async function handleUserInput(userInput) {
       appendMessage("bot", nameMessage);
       if (isVoiceInput) speak(nameMessage);
     }
-  
     // Bot info
     else if (/who are you/i.test(userInput)) {
       const greetingMessage = userName
