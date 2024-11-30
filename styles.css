@@ -20,7 +20,7 @@ body {
 .chat-container {
     width: 90%;
     max-width: 600px;
-    height: 80vh;
+    height: 85vh;
     display: flex;
     flex-direction: column;
     background-color: #1e2235;
@@ -33,11 +33,13 @@ body {
 /* Header */
 .chat-header {
     background-color: #111426;
-    padding: 20px;
+    padding: 16px;
     text-align: center;
-    font-size: 22px;
+    font-size: 24px;
+    font-weight: bold;
     letter-spacing: 1.5px;
     border-bottom: 1px solid #333;
+    color: #61dafb;
 }
 
 /* Chat Box */
@@ -165,11 +167,16 @@ input::placeholder {
     box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* Responsive Design */
+/* Enhanced Mobile Responsiveness */
 @media (max-width: 768px) {
     .chat-container {
         height: 90vh;
         width: 95%;
+    }
+
+    .chat-header {
+        font-size: 20px;
+        padding: 12px;
     }
 
     .icon-button, .send-button {
@@ -185,4 +192,3 @@ input::placeholder {
         font-size: 12px;
     }
 }
-

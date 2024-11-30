@@ -7,25 +7,31 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- Main Chat Container -->
     <div class="chat-container">
+        <!-- Header Section -->
         <header class="chat-header">
-            <h1>Terra Bot</h1>
+            <h1>🤖 Terra Bot</h1>
         </header>
 
-        <!-- Chat Box -->
+        <!-- Chat Messages Section -->
         <div id="chatBox" class="chat-box"></div>
 
         <!-- Input Section -->
         <div class="input-container">
-            <button id="voiceBtn" class="icon-button">
+            <!-- Voice Input Button -->
+            <button id="voiceBtn" class="icon-button" aria-label="Voice Input">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/8/80/MicrophoneAudio.svg" 
-                     alt="Voice Input" class="icon">
+                     alt="Voice Input Icon" class="icon">
             </button>
-            <input type="text" id="inputText" placeholder="Ask me anything..." />
-            <button id="sendBtn" class="send-button">➤</button>
+            <!-- Text Input Field -->
+            <input type="text" id="inputText" placeholder="Ask me anything..." aria-label="Type your message here" />
+            <!-- Send Button -->
+            <button id="sendBtn" class="send-button" aria-label="Send Message">➤</button>
         </div>
     </div>
 
+    <!-- Footer Section -->
     <footer class="footer">
         Developed by Md Tausif © 2024. All rights reserved.
     </footer>
