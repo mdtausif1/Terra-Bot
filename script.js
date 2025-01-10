@@ -49,7 +49,7 @@ async function gatherInitialInfo() {
 
 // Fetch weather for a given city
 async function fetchWeather(city) {
-  const apiKey = "5efc96245a17257ae45388f95bf301b0"; // Replace with your API key
+  const apiKey = "452551c1fefe765858e110910c4d4c3b"; // Replace with your API key
   const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
 
   try {
@@ -106,127 +106,143 @@ async function handleInput(text) {
 
 // Core logic for handling user input
 async function handleUserInput(userInput) {
-    // Location-related responses
-    if (/location|where am i|which country|current location|city/i.test(userInput)) {
-      if (cachedData.city && cachedData.region && cachedData.country) {
-        // Reply with full country name if available
-        const countryName = await getCountryName(cachedData.country);
-        const locationMessage = `Based on your IP, you're in ${cachedData.city || "an unknown city"}, ${cachedData.region || "an unknown state"}, ${countryName}.`;
-        appendMessage("bot", locationMessage);
-        if (isVoiceInput) speak(locationMessage);
-      } else {
-        appendMessage("bot", "I couldn't fetch your location. Please check your device settings.");
-        if (isVoiceInput) speak("I couldn't fetch your location. Please check your device settings.");
-      }
-    }
+  const lowerInput = userInput.toLowerCase().trim();
 
-    // Forget name logic
-    else if (/forget my name|erase my name|clear my name/i.test(userInput)) {
-      localStorage.removeItem("userName");  // Remove name from local storage
-      userName = "";  // Reset the userName variable
-      appendMessage("bot", "Your name has been forgotten.");
-      if (isVoiceInput) speak("Your name has been forgotten.");
-    }
-
-      // Handle "My name is" scenario to remember the name
-      else if (/my name is (\w+)/i.test(userInput)) {
-        const nameMatch = userInput.match(/my name is (\w+)/i);
-        if (nameMatch) {
-            userName = nameMatch[1];  // Set userName to the captured name
-            localStorage.setItem("userName", userName);  // Store it in localStorage
-            appendMessage("bot", `Got it! I'll remember your name as ${userName}.`);
-            if (isVoiceInput) speak(`Got it! I'll remember your name as ${userName}.`);
-        }
-    }
-    
-    // Time-related responses
-    else if (/time|current time/i.test(userInput)) {
-      const now = new Date();
-      const formattedTime = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
-      appendMessage("bot", `The current time is ${formattedTime}.`);
-      if (isVoiceInput) speak(`The current time is ${formattedTime}.`);
-    }
-  
-    // Date-related responses
-    else if (/date|today's date/i.test(userInput)) {
-      const today = new Date().toLocaleDateString("en-US");  // MM/DD/YYYY format
-      appendMessage("bot", `Today's date is ${today}.`);
-      if (isVoiceInput) speak(`Today's date is ${today}.`);
-    }
-  
-    // Day-related responses
-    else if (/day/i.test(userInput)) {
-      const now = new Date();
-      const day = now.toLocaleString('en-US', { weekday: 'long' });  // Gets the full day name
-      const date = now.toLocaleDateString('en-US'); // MM/DD/YYYY format
-      appendMessage("bot", `Today is ${day}, ${date}.`);
-      if (isVoiceInput) speak(`Today is ${day}, ${date}.`);
-    }
-  
-    // Developer info
-    else if (/who made you|developer/i.test(userInput)) {
-      appendMessage("bot", "I was developed by Md Tausif.");
-      if (isVoiceInput) speak("I was developed by Md Tausif.");
-    }
-  
-    // Owner info
-    else if (/who is the owner of this application|owner/i.test(userInput)) {
-      appendMessage("bot", "The owner of this application is also Md Tausif.");
-      if (isVoiceInput) speak("The owner of this application is Md Tausif.");
-    } 
-  
-    // Remember name response
-    else if (/remember my name (is|as)/i.test(userInput)) {
-      const nameMatch = userInput.match(/remember my name (is|as) (\w+)/i);
-      if (nameMatch) {
-        userName = nameMatch[2];
-        localStorage.setItem("userName", userName);
-        appendMessage("bot", `Got it! I'll remember your name as ${userName}.`);
-        if (isVoiceInput) speak(`Got it! I'll remember your name as ${userName}.`);
-      } else {
-        appendMessage("bot", "Please provide your name after 'remember my name as' or 'remember my name is'.");
-        if (isVoiceInput) speak("Please provide your name after 'remember my name as' or 'remember my name is'.");
-      }
-    }
-  
-    // Respond with user's name if remembered
-    else if (/who am i|what is my name|my name/i.test(userInput)) {
-      const nameMessage = userName ? `Your name is ${userName}.` : "I don't know your name yet.";
-      appendMessage("bot", nameMessage);
-      if (isVoiceInput) speak(nameMessage);
-    }
-    // Bot info
-    else if (/who are you/i.test(userInput)) {
-      const greetingMessage = userName
-        ? `I'm Terra-Bot, your virtual assistant, and I know you as ${userName}! 🌟`
-        : "I'm Terra-Bot, your virtual assistant! 🌟";
-      appendMessage("bot", greetingMessage);
-      if (isVoiceInput) speak(greetingMessage);
-    }
-  
-    // Developer info
-    else if (/who made you|developer|owner/i.test(userInput)) {
-      appendMessage("bot", "I was developed by Md Tausif.");
+  // Location-related responses
+  if (/location|where am i|which country|current location|city/i.test(lowerInput)) {
+    if (cachedData.city && cachedData.region && cachedData.country) {
+      const countryName = await getCountryName(cachedData.country);
+      const locationMessage = `Based on your IP, you're in ${cachedData.city || "an unknown city"}, ${cachedData.region || "an unknown state"}, ${countryName}.`;
+      appendMessage("bot", locationMessage);
+      if (isVoiceInput) speak(locationMessage);
     } else {
-      await fetchBotResponse(userInput); // Handle general queries via API
+      appendMessage("bot", "I couldn't fetch your location. Please check your device settings.");
+      if (isVoiceInput) speak("I couldn't fetch your location. Please check your device settings.");
     }
   }
-  
-  // Helper function to get full country name
-  async function getCountryName(countryCode) {
-    const countryNames = {
-      "IN": "India",
-      "US": "United States",
-      "GB": "United Kingdom",
-      "CA": "Canada",
-      "AU": "Australia",
-      "DE": "Germany",
-      // Add more country codes and names as needed
-    };
-    
-    return countryNames[countryCode] || "an unknown country"; // Default if country not found
+
+  // Weather-related queries
+  else if (/weathe?r/i.test(lowerInput)) { // Handles 'weather' and common typos
+    const locationMatch = lowerInput.match(/weather in ([a-z\s]+)/i);
+    if (locationMatch) {
+      const city = locationMatch[1].trim();
+      const weatherMessage = await fetchWeather(city);
+      appendMessage("bot", weatherMessage);
+      if (isVoiceInput) speak(weatherMessage);
+    } else if (cachedData.city) {
+      const weatherMessage = await fetchWeather(cachedData.city);
+      appendMessage("bot", `Based on your location, ${weatherMessage}`);
+      if (isVoiceInput) speak(`Based on your location, ${weatherMessage}`);
+    } else {
+      appendMessage("bot", "Please specify a location (e.g., 'weather in Cuttack').");
+      if (isVoiceInput) speak("Please specify a location for the weather.");
+    }
   }
-  
+
+  // Forget name logic
+  else if (/forget my name|erase my name|clear my name/i.test(lowerInput)) {
+    localStorage.removeItem("userName");
+    userName = "";
+    appendMessage("bot", "Your name has been forgotten.");
+    if (isVoiceInput) speak("Your name has been forgotten.");
+  }
+
+  // Handle "My name is" scenario to remember the name
+  else if (/my name is (\w+)/i.test(lowerInput)) {
+    const nameMatch = lowerInput.match(/my name is (\w+)/i);
+    if (nameMatch) {
+      userName = nameMatch[1];
+      localStorage.setItem("userName", userName);
+      appendMessage("bot", `Got it! I'll remember your name as ${userName}.`);
+      if (isVoiceInput) speak(`Got it! I'll remember your name as ${userName}.`);
+    }
+  }
+
+  // Time-related responses
+  else if (/time|current time/i.test(lowerInput)) {
+    const now = new Date();
+    const formattedTime = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+    appendMessage("bot", `The current time is ${formattedTime}.`);
+    if (isVoiceInput) speak(`The current time is ${formattedTime}.`);
+  }
+
+  // Date-related responses
+  else if (/date|today's date/i.test(lowerInput)) {
+    const today = new Date().toLocaleDateString("en-US");
+    appendMessage("bot", `Today's date is ${today}.`);
+    if (isVoiceInput) speak(`Today's date is ${today}.`);
+  }
+
+  // Day-related responses
+  else if (/day/i.test(lowerInput)) {
+    const now = new Date();
+    const day = now.toLocaleString('en-US', { weekday: 'long' });
+    const date = now.toLocaleDateString('en-US');
+    appendMessage("bot", `Today is ${day}, ${date}.`);
+    if (isVoiceInput) speak(`Today is ${day}, ${date}.`);
+  }
+
+  // Developer info
+  else if (/who made you|developer/i.test(lowerInput)) {
+    appendMessage("bot", "I was developed by Md Tausif.");
+    if (isVoiceInput) speak("I was developed by Md Tausif.");
+  }
+
+  // Owner info
+  else if (/who is the owner of this application|owner/i.test(lowerInput)) {
+    appendMessage("bot", "The owner of this application is also Md Tausif.");
+    if (isVoiceInput) speak("The owner of this application is Md Tausif.");
+  }
+
+  // Remember name response
+  else if (/remember my name (is|as)/i.test(lowerInput)) {
+    const nameMatch = lowerInput.match(/remember my name (is|as) (\w+)/i);
+    if (nameMatch) {
+      userName = nameMatch[2];
+      localStorage.setItem("userName", userName);
+      appendMessage("bot", `Got it! I'll remember your name as ${userName}.`);
+      if (isVoiceInput) speak(`Got it! I'll remember your name as ${userName}.`);
+    } else {
+      appendMessage("bot", "Please provide your name after 'remember my name as' or 'remember my name is'.");
+      if (isVoiceInput) speak("Please provide your name after 'remember my name as' or 'remember my name is'.");
+    }
+  }
+
+  // Respond with user's name if remembered
+  else if (/who am i|what is my name|my name/i.test(lowerInput)) {
+    const nameMessage = userName ? `Your name is ${userName}.` : "I don't know your name yet.";
+    appendMessage("bot", nameMessage);
+    if (isVoiceInput) speak(nameMessage);
+  }
+
+  // Bot info
+  else if (/who are you/i.test(lowerInput)) {
+    const greetingMessage = userName
+      ? `I'm Terra-Bot, your virtual assistant, and I know you as ${userName}! 🌟`
+      : "I'm Terra-Bot, your virtual assistant! 🌟";
+    appendMessage("bot", greetingMessage);
+    if (isVoiceInput) speak(greetingMessage);
+  }
+
+  // General fallback for unsupported queries
+  else {
+    await fetchBotResponse(userInput);
+  }
+}
+
+// Helper function to get full country name
+async function getCountryName(countryCode) {
+  const countryNames = {
+    IN: "India",
+    US: "United States",
+    GB: "United Kingdom",
+    CA: "Canada",
+    AU: "Australia",
+    DE: "Germany",
+  };
+  return countryNames[countryCode] || "an unknown country";
+}
+
   
   
   
@@ -239,7 +255,7 @@ async function fetchBotResponse(userInput) {
   chatBox.scrollTop = chatBox.scrollHeight;
 
   try {
-    const apiKey = "AIzaSyDnuDrh1wI7q9kUSRoy6wBCxIPrJEwn15s"; // Replace with your API key
+    const apiKey = "AIzaSyAFM7YFN8HIXVdGAGOrYX4NwNfvf76o1BA"; // Replace with your API key
     const body = {
       contents: [
         {
